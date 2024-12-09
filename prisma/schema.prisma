@@ -1,0 +1,83 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String // "admin", "vendor", "customer"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Shop      Shop?
+  Orders    Order[]
+  Reviews   Review[] // Add this relation for Review
+}
+
+model Shop {
+  id          Int       @id @default(autoincrement())
+  name        String
+  logo        String
+  description String
+  vendorId    Int       @unique
+  vendor      User      @relation(fields: [vendorId], references: [id])
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  price       Float
+  category    String
+  inventory   Int
+  description String
+  images      String[]
+  discount    Float       @default(0)
+  shopId      Int
+  shop        Shop        @relation(fields: [shopId], references: [id])
+  Reviews     Review[] // Add this relation for Review
+  OrderItems  OrderItem[] // Add this relation for OrderItem
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  rating    Int
+  comment   String
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id]) // Add this opposite relation
+  productId Int
+  product   Product @relation(fields: [productId], references: [id]) // Add this opposite relation
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  totalAmount Float
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id]) // Add this opposite relation
+  quantity  Int
+  price     Float
+}
