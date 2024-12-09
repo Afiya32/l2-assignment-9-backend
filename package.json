@@ -5,14 +5,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn src/server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js",
-  "prisma:migrate": "prisma migrate dev"
+    "prod": "NODE_ENV=production node ./dist/server.js",
+   "build": "tsc && prisma generate",
+    "start": "node dist/server.js",
+    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
